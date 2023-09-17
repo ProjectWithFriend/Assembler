@@ -5,12 +5,10 @@ public class IterateTokenizer implements Tokenizer {
     private String next;
     private String prev;
     private int pos;
-    private int line;
 
     public IterateTokenizer(String src) {
         this.src = src;
         pos = 0;
-        line = 1;
         computeNext();
     }
 
@@ -60,10 +58,10 @@ public class IterateTokenizer implements Tokenizer {
         }
     }
 
-    @Override
-    public int getLine() {
-        return line;
-    }
+//    @Override
+//    public int getLine() {
+//        return line;
+//    }
 
     private void processSingleLineComment() {
         while (pos < src.length() && src.charAt(pos) != '\n') {
@@ -71,23 +69,20 @@ public class IterateTokenizer implements Tokenizer {
         }
     }
 
-    private boolean ignoreCharacter(char c) {
-        return Character.isWhitespace(c) || c == '#' || c == '"';
-    }
-    private boolean isLetter(char c) {
-        return Character.isLetter(c) || c == '_';
-    }
+//    private boolean ignoreCharacter(char c) {
+//        return Character.isWhitespace(c) || c == '#' || c == '"';
+//    }
+//    private boolean isLetter(char c) {
+//        return Character.isLetter(c) || c == '_';
+//    }
 
     private void computeNext() {
         if (src == null) return;
         StringBuilder sb = new StringBuilder();
-        while (pos < src.length() && ignoreCharacter(src.charAt(pos))) {
-            if (src.charAt(pos) == '\n')
-                line++;
-            if (src.charAt(pos) == '#')
-                processSingleLineComment();
-            else
-                pos++;
+
+        //ignore whitespace
+        while (pos < src.length() && Character.isWhitespace(src.charAt(pos))) {
+            pos++;
         }
 
         if (pos == src.length()) {
@@ -95,24 +90,59 @@ public class IterateTokenizer implements Tokenizer {
             next = null;
             return;
         }
+
         char c = src.charAt(pos);
-        if (Character.isDigit(c)) {
-            while (pos < src.length() && Character.isDigit(src.charAt(pos))) {
-                sb.append(src.charAt(pos));
+        if (c == '#') { //comment
+            while (pos < src.length() && src.charAt(pos) != '\n') {
                 pos++;
             }
-        } else if (isLetter(c) || c == '_') {
-            while (pos < src.length() && isLetter(src.charAt(pos))) {
-                sb.append(src.charAt(pos));
+            pos++;
+            while (pos < src.length() && Character.isWhitespace(src.charAt(pos))) {
                 pos++;
             }
-        } else if ("()+-*/%^{}=".contains(String.valueOf(c))) {
+        }
+
+        while (pos < src.length() && !Character.isWhitespace(src.charAt(pos))) {
             sb.append(src.charAt(pos));
             pos++;
-        } else {
-            throw new TokenizerException.BadCharacter(c);
         }
+
         prev = next;
         next = sb.toString();
+
+        //commend reading
+//        while (pos < src.length() && ignoreCharacter(src.charAt(pos))) {
+//            if (src.charAt(pos) == '\n')
+//                line++;
+//            if (src.charAt(pos) == '#')
+//                processSingleLineComment();
+//            else
+//                pos++;
+//        }
+//        if (pos == src.length()) {
+//            prev = next;
+//            next = null;
+//            return;
+//        }
+//        char c = src.charAt(pos);
+//        if (Character.isDigit(c)) {
+//            while (pos < src.length() && Character.isDigit(src.charAt(pos))) {
+//                sb.append(src.charAt(pos));
+//                pos++;
+//            }
+//        } else if (isLetter(c) || c == '_') {
+//            while (pos < src.length() && isLetter(src.charAt(pos))) {
+//                sb.append(src.charAt(pos));
+//                pos++;
+//            }
+//        } else if ("()+-*/%^{}=".contains(String.valueOf(c))) {
+//            sb.append(src.charAt(pos));
+//            pos++;
+//        } else {
+//            throw new TokenizerException.BadCharacter(c);
+//        }
+//        prev = next;
+//        next = sb.toString();
+//    }
     }
 }

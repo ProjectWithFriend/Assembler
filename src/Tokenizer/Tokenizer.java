@@ -11,5 +11,5 @@ public interface Tokenizer {
 
     boolean consume(String s);
 
-    int getLine();
+//    int getLine();
 }
