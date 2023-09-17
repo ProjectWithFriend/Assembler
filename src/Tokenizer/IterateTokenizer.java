@@ -115,7 +115,7 @@ public class IterateTokenizer implements Tokenizer {
         }
 
         prev = next;
-        next = sb.toString();
+        next = sb.isEmpty()? null : sb.toString();
         isFirst = pos < src.length() && src.charAt(pos) == '\n';
     }
 }
