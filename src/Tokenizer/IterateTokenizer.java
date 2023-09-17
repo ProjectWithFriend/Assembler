@@ -96,13 +96,17 @@ public class IterateTokenizer implements Tokenizer {
             while (pos < src.length() && src.charAt(pos) != '\n') {
                 pos++;
             }
-            computeNext();
-        } else {
-            while (pos < src.length() && !Character.isWhitespace(src.charAt(pos))) {
-                sb.append(src.charAt(pos));
+            pos++;
+            while (pos < src.length() && Character.isWhitespace(src.charAt(pos))) {
                 pos++;
             }
         }
+
+        while (pos < src.length() && !Character.isWhitespace(src.charAt(pos))) {
+            sb.append(src.charAt(pos));
+            pos++;
+        }
+
         prev = next;
         next = sb.toString();
 
