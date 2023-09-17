@@ -18,7 +18,7 @@ public class Main {
             String src = sb.toString();
 //            System.out.println(src);
             Tokenizer tokenizer = new IterateTokenizer(src);
-            while(tokenizer.hasNext()) {
+            for(int i = 0 ;i < 6 ; i++){
                 System.out.println(tokenizer.consume());
             }
 

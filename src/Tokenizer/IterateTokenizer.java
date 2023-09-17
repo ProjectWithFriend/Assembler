@@ -60,6 +60,10 @@ public class IterateTokenizer implements Tokenizer {
         }
     }
 
+//    @Override
+//    public int getLine() {
+//        return line;
+//    }
 
     private void processSingleLineComment() {
         while (pos < src.length() && src.charAt(pos) != '\n') {
