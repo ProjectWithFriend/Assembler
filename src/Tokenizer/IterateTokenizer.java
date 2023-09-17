@@ -6,6 +6,10 @@ public class IterateTokenizer implements Tokenizer {
     private String prev;
     private int pos;
 
+
+    private boolean isFirst = true;
+
+
     public IterateTokenizer(String src) {
         this.src = src;
         pos = 0;
@@ -69,21 +73,23 @@ public class IterateTokenizer implements Tokenizer {
         }
     }
 
-//    private boolean ignoreCharacter(char c) {
-//        return Character.isWhitespace(c) || c == '#' || c == '"';
-//    }
-//    private boolean isLetter(char c) {
-//        return Character.isLetter(c) || c == '_';
-//    }
+
+    private void processWhiteSpace() {
+        while (pos < src.length() && Character.isWhitespace(src.charAt(pos))) {
+            pos++;
+        }
+    }
+
+
 
     private void computeNext() {
         if (src == null) return;
         StringBuilder sb = new StringBuilder();
 
         //ignore whitespace
-        while (pos < src.length() && Character.isWhitespace(src.charAt(pos))) {
-            pos++;
-        }
+
+        processWhiteSpace();
+
 
         if (pos == src.length()) {
             prev = next;
@@ -93,13 +99,14 @@ public class IterateTokenizer implements Tokenizer {
 
         char c = src.charAt(pos);
         if (c == '#') { //comment
-            while (pos < src.length() && src.charAt(pos) != '\n') {
-                pos++;
-            }
+            processSingleLineComment();
+            isFirst = true;
             pos++;
-            while (pos < src.length() && Character.isWhitespace(src.charAt(pos))) {
-                pos++;
-            }
+            processWhiteSpace();
+        }
+
+        if (isFirst && pos < src.length() && Character.isDigit(src.charAt(pos))) {
+            throw new TokenizerException.BadCharacter(src.charAt(pos));
         }
 
         while (pos < src.length() && !Character.isWhitespace(src.charAt(pos))) {
@@ -109,40 +116,6 @@ public class IterateTokenizer implements Tokenizer {
 
         prev = next;
         next = sb.toString();
-
-        //commend reading
-//        while (pos < src.length() && ignoreCharacter(src.charAt(pos))) {
-//            if (src.charAt(pos) == '\n')
-//                line++;
-//            if (src.charAt(pos) == '#')
-//                processSingleLineComment();
-//            else
-//                pos++;
-//        }
-//        if (pos == src.length()) {
-//            prev = next;
-//            next = null;
-//            return;
-//        }
-//        char c = src.charAt(pos);
-//        if (Character.isDigit(c)) {
-//            while (pos < src.length() && Character.isDigit(src.charAt(pos))) {
-//                sb.append(src.charAt(pos));
-//                pos++;
-//            }
-//        } else if (isLetter(c) || c == '_') {
-//            while (pos < src.length() && isLetter(src.charAt(pos))) {
-//                sb.append(src.charAt(pos));
-//                pos++;
-//            }
-//        } else if ("()+-*/%^{}=".contains(String.valueOf(c))) {
-//            sb.append(src.charAt(pos));
-//            pos++;
-//        } else {
-//            throw new TokenizerException.BadCharacter(c);
-//        }
-//        prev = next;
-//        next = sb.toString();
-//    }
+        isFirst = pos < src.length() && src.charAt(pos) == '\n';
     }
 }
