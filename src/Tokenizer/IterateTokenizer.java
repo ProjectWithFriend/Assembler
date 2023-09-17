@@ -6,7 +6,9 @@ public class IterateTokenizer implements Tokenizer {
     private String prev;
     private int pos;
 
+
     private boolean isFirst = true;
+
 
     public IterateTokenizer(String src) {
         this.src = src;
@@ -71,6 +73,7 @@ public class IterateTokenizer implements Tokenizer {
         }
     }
 
+
     private void processWhiteSpace() {
         while (pos < src.length() && Character.isWhitespace(src.charAt(pos))) {
             pos++;
@@ -78,12 +81,15 @@ public class IterateTokenizer implements Tokenizer {
     }
 
 
+
     private void computeNext() {
         if (src == null) return;
         StringBuilder sb = new StringBuilder();
 
         //ignore whitespace
+
         processWhiteSpace();
+
 
         if (pos == src.length()) {
             prev = next;
@@ -102,6 +108,7 @@ public class IterateTokenizer implements Tokenizer {
         if (isFirst && pos < src.length() && Character.isDigit(src.charAt(pos))) {
             throw new TokenizerException.BadCharacter(src.charAt(pos));
         }
+
         while (pos < src.length() && !Character.isWhitespace(src.charAt(pos))) {
             sb.append(src.charAt(pos));
             pos++;
