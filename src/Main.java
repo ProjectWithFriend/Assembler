@@ -1,6 +1,7 @@
 import Tokenizer.*;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
@@ -16,10 +17,17 @@ public class Main {
             }
             scanner.close();
             String src = sb.toString();
-//            System.out.println(src);
             Tokenizer tokenizer = new IterateTokenizer(src);
             while(tokenizer.hasNext()) {
                 System.out.println(tokenizer.consume());
+            }
+
+            ArrayList<ArrayList<String>> mappingInstruction = tokenizer.getMappingInstruction();
+            for (ArrayList<String> line : mappingInstruction) {
+                for (String token : line) {
+                    System.out.print(token + " ");
+                }
+                System.out.println();
             }
 
         } catch (FileNotFoundException e) {
