@@ -1,5 +1,7 @@
 package Tokenizer;
 
+import java.util.ArrayList;
+
 public interface Tokenizer {
     boolean hasNext();
 
@@ -11,5 +13,5 @@ public interface Tokenizer {
 
     boolean consume(String s);
 
-//    int getLine();
+    ArrayList<ArrayList<String>> getMappingInstruction();
 }
