@@ -180,31 +180,5 @@ public class IterateTokenizer implements Tokenizer {
 
         prev = next;
         next = sb.toString();
-
-
-//        //ignore whitespace
-//        processWhiteSpace();
-//        if (pos == src.length()) {
-//            prev = next;
-//            next = null;
-//            return;
-//        }
-//        char c = src.charAt(pos);
-//        if (c == '#') { //comment
-//            processSingleLineComment();
-//            isFirst = true;
-//            pos++;
-//            processWhiteSpace();
-//        }
-//        if (isFirst && pos < src.length() && Character.isDigit(src.charAt(pos))) {
-//            throw new TokenizerException.BadCharacter(src.charAt(pos));
-//        }
-//        while (pos < src.length() && !Character.isWhitespace(src.charAt(pos))) {
-//            sb.append(src.charAt(pos));
-//            pos++;
-//        }
-//        prev = next;
-//        next = sb.toString();
-//        isFirst = pos < src.length() && src.charAt(pos) == '\n';
     }
 }
