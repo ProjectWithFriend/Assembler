@@ -1,3 +1,4 @@
+import Parser.*;
 import Tokenizer.*;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -19,16 +20,21 @@ public class Main {
             String src = sb.toString();
             Tokenizer tokenizer = new IterateTokenizer(src);
             while(tokenizer.hasNext()) {
-                System.out.println(tokenizer.consume());
+                tokenizer.consume();
+//                System.out.println(tokenizer.consume());
             }
 
-            ArrayList<ArrayList<String>> mappingInstruction = tokenizer.getMappingInstruction();
-            for (ArrayList<String> line : mappingInstruction) {
-                for (String token : line) {
-                    System.out.print(token + " ");
-                }
-                System.out.println();
-            }
+            Parser parser = new MappingParser(tokenizer.getMappingInstruction());
+            parser.PrintBinaryFile();
+            return;
+
+//            ArrayList<ArrayList<String>> mappingInstruction = tokenizer.getMappingInstruction();
+//            for (ArrayList<String> line : mappingInstruction) {
+//                for (String token : line) {
+//                    System.out.print(token + " ");
+//                }
+//                System.out.println();
+//            }
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();

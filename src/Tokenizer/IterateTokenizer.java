@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class IterateTokenizer implements Tokenizer {
     private enum instruction {
         add, nand, lw, sw, beq, jalr, halt, noop
-    };
+    }
 
     private final String src;
     private String next;
