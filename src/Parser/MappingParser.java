@@ -60,18 +60,14 @@ public class MappingParser implements Parser {
                     binary = "";
                     try{
                         switch (instruction) {
-                            case "add", "nand" -> {//R-type
-                                binary = R_type(instructions, Bit24_22);
-                            }
-                            case "lw", "sw", "beq" -> {//I-type
-                                binary = I_type(instructions, Bit24_22, line, instruction.equals("beq"));
-                            }
-                            case "jalr" -> {//J-type
-                                binary = J_type(instructions, Bit24_22);
-                            }
-                            case "halt", "noop" -> {//O-type
-                                binary = Bit31_25 + Bit24_22 + "0000000000000000000000";
-                            }
+                            case "add", "nand" -> //R-type
+                                    binary = R_type(instructions, Bit24_22);
+                            case "lw", "sw", "beq" -> //I-type
+                                    binary = I_type(instructions, Bit24_22, line, instruction.equals("beq"));
+                            case "jalr" -> //J-type
+                                    binary = J_type(instructions, Bit24_22);
+                            case "halt", "noop" -> //O-type
+                                    binary = Bit31_25 + Bit24_22 + "0000000000000000000000";
                         }
                     }catch (Exception e) {
                         System.exit(1);
@@ -165,7 +161,7 @@ public class MappingParser implements Parser {
 
     private boolean isNmu(String strNum) {
         try {
-            double d = Double.parseDouble(strNum);
+            Double.parseDouble(strNum);
         } catch (NumberFormatException nfe) {
             return false;
         }
@@ -204,5 +200,4 @@ public class MappingParser implements Parser {
             }
         }
     }
-
 }
