@@ -5,7 +5,6 @@ import Tokenizer.TokenizerException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 public class MappingParser implements Parser {
 
@@ -23,7 +22,7 @@ public class MappingParser implements Parser {
     }
 
     private final ArrayList<ArrayList<String>> mappingInstruction;
-    private ArrayList<String> binaryCode;
+    private final ArrayList<String> binaryCode;
     private final HashMap<String, ArrayList<Integer>> labels;
     private final HashMap<String, String> opcodeTable = new HashMap<>();
     private final String Bit31_25 = "0000000";
@@ -53,7 +52,7 @@ public class MappingParser implements Parser {
         int line = 0;
         for (ArrayList<String> instructions : mappingInstruction) {
             line++;
-            String binary = "";
+            String binary;
             if (!instructions.isEmpty()) { // to check is in not case last member is empty list
                 if (findEnum(instructions.get(0))) {
                     String instruction = instructions.get(0);
@@ -62,46 +61,17 @@ public class MappingParser implements Parser {
                     try{
                         switch (instruction) {
                             case "add", "nand" -> {//R-type
-                                String Bit21_19 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(1))));
-                                String Bit18_16 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(2))));
-                                String Bit15_3 = "0000000000000";
-                                String Bit2_0 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(3))));
-                                binary = Bit31_25 + Bit24_22 + Bit21_19 + Bit18_16 + Bit15_3 + Bit2_0;
+                                binary = R_type(instructions, Bit24_22);
                             }
                             case "lw", "sw", "beq" -> {//I-type
-                                String Bit21_19 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(1))));
-                                String Bit18_16 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(2))));
-                                String Bit15_0;
-                                if (isNmu(instructions.get(3))) {
-                                    if (instruction.equals("beq")) {
-                                        int offset = Integer.parseInt(instructions.get(3));
-                                        String off = ExtendTo16Bit(Integer.toBinaryString(offset));
-                                        Bit15_0 = ExtendTo16Bit(off);
-                                    } else {
-                                        Bit15_0 = ExtendTo16Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(3))));
-                                    }
-                                } else {
-                                    if (labels.get(instructions.get(3)) == null) {
-                                        System.exit(1);
-                                    }
-                                    if (instruction.equals("beq")) {
-                                        int offset = labels.get(instructions.get(3)).get(0) - line;
-                                        String off = ExtendTo16Bit(Integer.toBinaryString(offset));
-                                        Bit15_0 = ExtendTo16Bit(off);
-                                    } else {
-                                        int offset = labels.get(instructions.get(3)).get(0);
-                                        Bit15_0 = ExtendTo16Bit(Integer.toBinaryString(offset));
-                                    }
-                                }
-                                binary = Bit31_25 + Bit24_22 + Bit21_19 + Bit18_16 + Bit15_0;
+                                binary = I_type(instructions, Bit24_22, line, instruction.equals("beq"));
                             }
-                            case "jalr" -> {//J-typr
-                                String Bit21_19 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(1))));
-                                String Bit18_16 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(2))));
-                                String Bit15_0 = "0000000000000000";
-                                binary = Bit31_25 + Bit24_22 + Bit21_19 + Bit18_16 + Bit15_0;
+                            case "jalr" -> {//J-type
+                                binary = J_type(instructions, Bit24_22);
                             }
-                            case "halt", "noop" -> binary = Bit31_25 + Bit24_22 + "0000000000000000000000";//O-type
+                            case "halt", "noop" -> {//O-type
+                                binary = Bit31_25 + Bit24_22 + "0000000000000000000000";
+                            }
                         }
                     }catch (Exception e) {
                         System.exit(1);
@@ -116,6 +86,49 @@ public class MappingParser implements Parser {
                 binaryCode.add(binary);
             }
         }
+    }
+
+    private String R_type(ArrayList<String> instructions, String Bit24_22){
+        String Bit21_19 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(1))));
+        String Bit18_16 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(2))));
+        String Bit15_3 = "0000000000000";
+        String Bit2_0 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(3))));
+        return Bit31_25 + Bit24_22 + Bit21_19 + Bit18_16 + Bit15_3 + Bit2_0;
+    }
+
+    private String I_type(ArrayList<String> instructions, String Bit24_22, int line, boolean is_beq){
+        String Bit21_19 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(1))));
+        String Bit18_16 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(2))));
+        String Bit15_0;
+        if (isNmu(instructions.get(3))) {
+            if (is_beq) {
+                int offset = Integer.parseInt(instructions.get(3));
+                String off = ExtendTo16Bit(Integer.toBinaryString(offset));
+                Bit15_0 = ExtendTo16Bit(off);
+            } else {
+                Bit15_0 = ExtendTo16Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(3))));
+            }
+        } else {
+            if (labels.get(instructions.get(3)) == null) {
+                System.exit(1);
+            }
+            if (is_beq) {
+                int offset = labels.get(instructions.get(3)).get(0) - line;
+                String off = ExtendTo16Bit(Integer.toBinaryString(offset));
+                Bit15_0 = ExtendTo16Bit(off);
+            } else {
+                int offset = labels.get(instructions.get(3)).get(0);
+                Bit15_0 = ExtendTo16Bit(Integer.toBinaryString(offset));
+            }
+        }
+        return Bit31_25 + Bit24_22 + Bit21_19 + Bit18_16 + Bit15_0;
+    }
+
+    private String J_type(ArrayList<String> instructions, String Bit24_22){
+        String Bit21_19 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(1))));
+        String Bit18_16 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(2))));
+        String Bit15_0 = "0000000000000000";
+        return Bit31_25 + Bit24_22 + Bit21_19 + Bit18_16 + Bit15_0;
     }
 
     private String ExtendTo3Bit(String number) {
@@ -163,7 +176,8 @@ public class MappingParser implements Parser {
         for (int i = 0; i < mappingInstruction.size() - 1; i++) {
             if (!findEnum(mappingInstruction.get(i).get(0))) {//if to check is label?
                 String word = mappingInstruction.get(i).get(0);
-                if (Character.isDigit(word.charAt(0)) || word.equals(".fill")) {// if check label start with number or .fill
+                if (Character.isDigit(word.charAt(0)) || word.equals(".fill")) {
+                    // if check label start with number or .fill
                     throw new TokenizerException.BadCharacter(word.charAt(0));
                 }
 
