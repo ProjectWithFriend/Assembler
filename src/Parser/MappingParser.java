@@ -1,8 +1,6 @@
 package Parser;
 
 
-import Tokenizer.TokenizerException;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -23,6 +21,7 @@ public class MappingParser implements Parser {
 
     private final ArrayList<ArrayList<String>> mappingInstruction;
     private final ArrayList<String> binaryCode;
+    private final ArrayList<Integer> decimalCode;
     private final HashMap<String, ArrayList<Integer>> labels;
     private final HashMap<String, String> opcodeTable = new HashMap<>();
     private final String Bit31_25 = "0000000";
@@ -30,6 +29,7 @@ public class MappingParser implements Parser {
     public MappingParser(ArrayList<ArrayList<String>> mappingInstruction) {
         this.mappingInstruction = mappingInstruction;
         binaryCode = new ArrayList<>();
+        decimalCode = new ArrayList<>();
         labels = new HashMap<>();
         opcodeTable.put("add", "000");
         opcodeTable.put("nand", "001");
@@ -42,8 +42,17 @@ public class MappingParser implements Parser {
     }
 
     @Override
-    public String PrintBinaryFile() {
+    public String PrintCode() {
         MappingInstruction();
+        System.out.println("Binary Code:");
+        for(String code : binaryCode){
+            decimalCode.add((int) Long.parseLong(code,2));
+            System.out.println(code);
+        }
+        System.out.println("Decimal Code:");
+        for(int code: decimalCode){
+            System.out.println(code);
+        }
         return null;
     }
 
@@ -72,8 +81,8 @@ public class MappingParser implements Parser {
                     }catch (Exception e) {
                         System.exit(1);
                     }
-                } else {
-                    if(isNmu(instructions.get(1))){
+                } else {//.fill case
+                    if(isNum(instructions.get(1))){
                         binary = ExtendTo32Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(1))));
                     }else{
                         binary = ExtendTo32Bit(Integer.toBinaryString(labels.get(instructions.get(1)).get(0)));
@@ -85,46 +94,116 @@ public class MappingParser implements Parser {
     }
 
     private String R_type(ArrayList<String> instructions, String Bit24_22){
-        String Bit21_19 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(1))));
-        String Bit18_16 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(2))));
-        String Bit15_3 = "0000000000000";
-        String Bit2_0 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(3))));
-        return Bit31_25 + Bit24_22 + Bit21_19 + Bit18_16 + Bit15_3 + Bit2_0;
+        StringBuilder code = new StringBuilder(Bit31_25);
+        code.append(Bit24_22);
+        for(int i = 1; i <= 3; i++){
+            if(i == 3) code.append("0000000000000");
+            if(isNum(instructions.get(i))){
+                if(Integer.parseInt(instructions.get(i)) > 7)
+                    System.exit(1);
+                code.append(ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(i)))));
+            }else{
+                if(labels.get(instructions.get(i)).get(0) > 7)
+                    System.exit(1);
+                int line_label = labels.get(instructions.get(i)).get(0);
+                code.append(ExtendTo3Bit(Integer.toBinaryString(line_label)));
+            }
+        }
+        return code.toString();
+//        String Bit21_19 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(1))));
+//        String Bit18_16 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(2))));
+//        String Bit15_3 = "0000000000000";
+//        String Bit2_0 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(3))));
+//        return Bit31_25 + Bit24_22 + Bit21_19 + Bit18_16 + Bit15_3 + Bit2_0;
     }
 
     private String I_type(ArrayList<String> instructions, String Bit24_22, int line, boolean is_beq){
-        String Bit21_19 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(1))));
-        String Bit18_16 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(2))));
-        String Bit15_0;
-        if (isNmu(instructions.get(3))) {
-            if (is_beq) {
-                int offset = Integer.parseInt(instructions.get(3));
-                String off = ExtendTo16Bit(Integer.toBinaryString(offset));
-                Bit15_0 = ExtendTo16Bit(off);
-            } else {
-                Bit15_0 = ExtendTo16Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(3))));
-            }
-        } else {
-            if (labels.get(instructions.get(3)) == null) {
-                System.exit(1);
-            }
-            if (is_beq) {
-                int offset = labels.get(instructions.get(3)).get(0) - line;
-                String off = ExtendTo16Bit(Integer.toBinaryString(offset));
-                Bit15_0 = ExtendTo16Bit(off);
-            } else {
-                int offset = labels.get(instructions.get(3)).get(0);
-                Bit15_0 = ExtendTo16Bit(Integer.toBinaryString(offset));
+        StringBuilder code = new StringBuilder(Bit31_25);
+        code.append(Bit24_22);
+        for(int i = 1; i <= 3; i++){
+            if(isNum(instructions.get(i))){
+                if(i != 3) {
+                    if (Integer.parseInt(instructions.get(i)) > 7)
+                        System.exit(1);
+                    code.append(ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(i)))));
+                }else{
+                    if(is_beq){
+                        int offset = Integer.parseInt(instructions.get(i));
+                        String off = ExtendTo16Bit(Integer.toBinaryString(offset));
+                        code.append(ExtendTo16Bit(off));
+                    }else{
+                        code.append(ExtendTo16Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(i)))));
+                    }
+                }
+            }else{
+                if(i != 3){
+                    if(Integer.parseInt(instructions.get(i)) > 7)
+                        System.exit(1);
+                    code.append(ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(i)))));
+                }else{
+                    if(is_beq){
+                        int offset = labels.get(instructions.get(i)).get(0) - line;
+                        String off = ExtendTo16Bit(Integer.toBinaryString(offset));
+                        code.append(ExtendTo16Bit(off));
+                    }else{
+//                        if(labels.get(instructions.get(i)).get(0) < 0)
+                        int offset =labels.get(instructions.get(i)).get(0) < 0 ?
+                                labels.get(instructions.get(i)).get(0) + line :
+                                labels.get(instructions.get(i)).get(0);
+                        code.append(ExtendTo16Bit(Integer.toBinaryString(offset)));
+                    }
+                }
             }
         }
-        return Bit31_25 + Bit24_22 + Bit21_19 + Bit18_16 + Bit15_0;
+        return code.toString();
+//        String Bit21_19 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(1))));
+//        String Bit18_16 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(2))));
+//        String Bit15_0;
+//        if (isNum(instructions.get(3))) {
+//            if (is_beq) {
+//                int offset = Integer.parseInt(instructions.get(3));
+//                String off = ExtendTo16Bit(Integer.toBinaryString(offset));
+//                Bit15_0 = ExtendTo16Bit(off);
+//            } else {
+//                Bit15_0 = ExtendTo16Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(3))));
+//            }
+//        } else {
+//            if (labels.get(instructions.get(3)) == null) {
+//                System.exit(1);
+//            }
+//            if (is_beq) {
+//                int offset = labels.get(instructions.get(3)).get(0) - line;
+//                String off = ExtendTo16Bit(Integer.toBinaryString(offset));
+//                Bit15_0 = ExtendTo16Bit(off);
+//            } else {
+//                int offset = labels.get(instructions.get(3)).get(0);
+//                Bit15_0 = ExtendTo16Bit(Integer.toBinaryString(offset));
+//            }
+//        }
+//        return Bit31_25 + Bit24_22 + Bit21_19 + Bit18_16 + Bit15_0;
     }
 
     private String J_type(ArrayList<String> instructions, String Bit24_22){
-        String Bit21_19 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(1))));
-        String Bit18_16 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(2))));
-        String Bit15_0 = "0000000000000000";
-        return Bit31_25 + Bit24_22 + Bit21_19 + Bit18_16 + Bit15_0;
+        StringBuilder code = new StringBuilder(Bit31_25);
+        code.append(Bit24_22);
+        for(int i = 1; i <= 2; i++){
+            if(isNum(instructions.get(i))){
+                if(Integer.parseInt(instructions.get(i)) > 7)
+                    System.exit(1);
+                code.append(ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(i)))));
+            }else{
+                if(labels.get(instructions.get(i)).get(0) > 7)
+                    System.exit(1);
+                int line_label = labels.get(instructions.get(i)).get(0);
+                code.append(ExtendTo3Bit(Integer.toBinaryString(line_label)));
+            }
+        }
+        code.append("0000000000000000");
+        return code.toString();
+//        String Bit21_19 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(1))));
+//        String Bit18_16 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(2))));
+//        String Bit15_0 = "0000000000000000";
+//        return Bit31_25 + Bit24_22 + Bit21_19 + Bit18_16 + Bit15_0;
     }
 
     private String ExtendTo3Bit(String number) {
@@ -159,7 +238,7 @@ public class MappingParser implements Parser {
         return number;
     }
 
-    private boolean isNmu(String strNum) {
+    private boolean isNum(String strNum) {
         try {
             Double.parseDouble(strNum);
         } catch (NumberFormatException nfe) {
@@ -172,9 +251,10 @@ public class MappingParser implements Parser {
         for (int i = 0; i < mappingInstruction.size() - 1; i++) {
             if (!findEnum(mappingInstruction.get(i).get(0))) {//if to check is label?
                 String word = mappingInstruction.get(i).get(0);
+//                if(word.length() > 6) System.exit(1);
                 if (Character.isDigit(word.charAt(0)) || word.equals(".fill")) {
                     // if check label start with number or .fill
-                    throw new TokenizerException.BadCharacter(word.charAt(0));
+                    System.exit(1);
                 }
 
                 ArrayList<Integer> values = new ArrayList<>();
@@ -185,14 +265,23 @@ public class MappingParser implements Parser {
                         values.add(Integer.parseInt(mappingInstruction.get(i).get(2)));
                     } catch (Exception e) {
                         if (labels.get(mappingInstruction.get(i).get(2)) == null) {
-                            throw new TokenizerException.BadCharacter('0');
+                            String keyword = mappingInstruction.get(i).get(2);
+                            for(int j = i; j < mappingInstruction.size() - 1; j++){
+                                if(mappingInstruction.get(j).get(0).equals(keyword)){
+                                    values.add(j);
+                                    break;
+                                }
+                                if(j == mappingInstruction.size() - 2){
+                                    System.exit(1);
+                                }
+                            }
                         } else {
                             int line = labels.get(mappingInstruction.get(i).get(2)).get(0);
                             values.add(line);
                         }
                     }
                 } else if (!findEnum(mappingInstruction.get(i).get(1))) {
-                    throw new TokenizerException.BadCharacter('0');
+                    System.exit(1);
                 }
 
                 labels.put(mappingInstruction.get(i).get(0), values);
