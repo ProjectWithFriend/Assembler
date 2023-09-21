@@ -162,7 +162,12 @@ public class IterateTokenizer implements Tokenizer {
                         mappingInstruction.get(line).add(sb.toString());
                         processWhiteSpace();
                         processSkipSpaceAndComment();
-                    }else{
+                    }else if(sb.toString().equals("jalr")){
+                        mappingInstruction.get(line).add(sb.toString());
+                        isFirst = false;
+                        filledField = 1;
+                    }
+                    else{
                         mappingInstruction.get(line).add(sb.toString());
                         isFirst = false;
                     }
