@@ -6,7 +6,7 @@ import java.util.ArrayList;
 public class IterateTokenizer implements Tokenizer {
     private enum instruction {
         add, nand, lw, sw, beq, jalr, halt, noop
-    };
+    }
 
     private final String src;
     private String next;
@@ -162,7 +162,12 @@ public class IterateTokenizer implements Tokenizer {
                         mappingInstruction.get(line).add(sb.toString());
                         processWhiteSpace();
                         processSkipSpaceAndComment();
-                    }else{
+                    }else if(sb.toString().equals("jalr")){
+                        mappingInstruction.get(line).add(sb.toString());
+                        isFirst = false;
+                        filledField = 1;
+                    }
+                    else{
                         mappingInstruction.get(line).add(sb.toString());
                         isFirst = false;
                     }
