@@ -2,7 +2,6 @@ import Parser.*;
 import Tokenizer.*;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
@@ -25,7 +24,7 @@ public class Main {
             }
 
             Parser parser = new MappingParser(tokenizer.getMappingInstruction());
-            parser.PrintBinaryFile();
+            parser.PrintCode();
             return;
 
 //            ArrayList<ArrayList<String>> mappingInstruction = tokenizer.getMappingInstruction();

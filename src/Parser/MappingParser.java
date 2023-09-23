@@ -137,17 +137,16 @@ public class MappingParser implements Parser {
                 }
             }else{
                 if(i != 3){
-                    if(Integer.parseInt(instructions.get(i)) > 7)
+                    if(labels.get(instructions.get(i)).get(0) > 7)
                         System.exit(1);
-                    code.append(ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(i)))));
+                    code.append(ExtendTo3Bit(Integer.toBinaryString(labels.get(instructions.get(i)).get(0))));
                 }else{
                     if(is_beq){
                         int offset = labels.get(instructions.get(i)).get(0) - line;
                         String off = ExtendTo16Bit(Integer.toBinaryString(offset));
                         code.append(ExtendTo16Bit(off));
                     }else{
-//                        if(labels.get(instructions.get(i)).get(0) < 0)
-                        int offset =labels.get(instructions.get(i)).get(0) < 0 ?
+                        int offset = labels.get(instructions.get(i)).get(0) - line < 0 ?
                                 labels.get(instructions.get(i)).get(0) + line :
                                 labels.get(instructions.get(i)).get(0);
                         code.append(ExtendTo16Bit(Integer.toBinaryString(offset)));
