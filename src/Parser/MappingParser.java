@@ -110,11 +110,6 @@ public class MappingParser implements Parser {
             }
         }
         return code.toString();
-//        String Bit21_19 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(1))));
-//        String Bit18_16 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(2))));
-//        String Bit15_3 = "0000000000000";
-//        String Bit2_0 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(3))));
-//        return Bit31_25 + Bit24_22 + Bit21_19 + Bit18_16 + Bit15_3 + Bit2_0;
     }
 
     private String I_type(ArrayList<String> instructions, String Bit24_22, int line, boolean is_beq){
@@ -155,31 +150,6 @@ public class MappingParser implements Parser {
             }
         }
         return code.toString();
-//        String Bit21_19 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(1))));
-//        String Bit18_16 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(2))));
-//        String Bit15_0;
-//        if (isNum(instructions.get(3))) {
-//            if (is_beq) {
-//                int offset = Integer.parseInt(instructions.get(3));
-//                String off = ExtendTo16Bit(Integer.toBinaryString(offset));
-//                Bit15_0 = ExtendTo16Bit(off);
-//            } else {
-//                Bit15_0 = ExtendTo16Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(3))));
-//            }
-//        } else {
-//            if (labels.get(instructions.get(3)) == null) {
-//                System.exit(1);
-//            }
-//            if (is_beq) {
-//                int offset = labels.get(instructions.get(3)).get(0) - line;
-//                String off = ExtendTo16Bit(Integer.toBinaryString(offset));
-//                Bit15_0 = ExtendTo16Bit(off);
-//            } else {
-//                int offset = labels.get(instructions.get(3)).get(0);
-//                Bit15_0 = ExtendTo16Bit(Integer.toBinaryString(offset));
-//            }
-//        }
-//        return Bit31_25 + Bit24_22 + Bit21_19 + Bit18_16 + Bit15_0;
     }
 
     private String J_type(ArrayList<String> instructions, String Bit24_22){
@@ -199,10 +169,6 @@ public class MappingParser implements Parser {
         }
         code.append("0000000000000000");
         return code.toString();
-//        String Bit21_19 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(1))));
-//        String Bit18_16 = ExtendTo3Bit(Integer.toBinaryString(Integer.parseInt(instructions.get(2))));
-//        String Bit15_0 = "0000000000000000";
-//        return Bit31_25 + Bit24_22 + Bit21_19 + Bit18_16 + Bit15_0;
     }
 
     private String ExtendTo3Bit(String number) {
@@ -250,7 +216,7 @@ public class MappingParser implements Parser {
         for (int i = 0; i < mappingInstruction.size() - 1; i++) {
             if (!findEnum(mappingInstruction.get(i).get(0))) {//if to check is label?
                 String word = mappingInstruction.get(i).get(0);
-//                if(word.length() > 6) System.exit(1);
+                if(word.length() > 6) System.exit(1);
                 if (Character.isDigit(word.charAt(0)) || word.equals(".fill")) {
                     // if check label start with number or .fill
                     System.exit(1);
