@@ -1,14 +1,18 @@
-        lw 0 1 input
-        lw 0 5 sStack
-        lw 0 4 check
-        lw 0 2 sub1
-fact    add 0 5 slot
-        sw 5 1 0
-        sw 5 7 1
-        add 1 2 6
-        beq 4 6 mult
-        add 5 2 5
-
+        lw 0 1 input    load input value into reg 1
+        lw 0 5 sStack   load location start stack into reg 5
+fact    lw 0 4 slot     load slot(2) into reg 4
+        add 5 4 5       add new slot 2 slot into stack
+        sw 5 1 0        store reg1 into slot 1
+        sw 5 7 1        store reg7 into slot 2
+        lw 0 3 sub1     load -1 into reg 4
+        add 1 3 6       reg 6 = input - 1
+        lw 0 4 check    load 1 into reg 4
+        beq 4 6 mult    if reg 6 = 1 , start multiple (1*2*3*...*n) else go to underline
+        add 1 3 1       input--
+        lw 0 6 fact     load fact location
+        jalr 6 7        jump to fact line and save pc + 1 into reg7 (it is underline this line)
+        add 2 1 2       add reg 2 by value reg 1
+        lw 5 3 0
 mult    lw 0 2 mplier
         lw 0 3 mcand
         lw 0 4 maskb
@@ -40,4 +44,5 @@ maxbit  .fill   15      for only 15bit calculation
 input   .fill   5       input for factorial
 sStack  .fill   100     stack for use in factorial
 slot    .fill   2       slot for use in stack
+dslot   .fill   -2      delete slot 2 slot
 check   .fill   1       check for beq
