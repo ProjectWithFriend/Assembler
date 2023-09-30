@@ -1,10 +1,51 @@
-        lw      0   1   five    load reg1 with 5 (uses symbolic address)
-        lw      1   2   3       load reg2 with -1 (uses numeric address)
-start   add     1   2   1       decrement reg1
-        beq     0   1   2       goto end of program when reg1==0
-        beq     0   0   start   go back to the beginning of the loop
-        noop
-done    halt                    end of program
-five    .fill   5
-neg1    .fill   -1
-stAddr  .fill   start           will contain the address of start (2)
+lw 0 1 n load n into reg1
+    lw 0 2 r load r into reg2
+    lw 0 5 sStack load base address of stack into reg5
+    lw 0 6 comb
+    jalr 6 7  jump to combi and store pc+1 into reg7
+    halt
+combi lw 0 6 rStack
+    add 5 6 5 sp = sp + 4
+    lw 0 6 zero load 0 into reg6
+    sw 5 6 0 store 0 into stack
+    sw 5 2 -1 store r into stack
+    sw 5 1 -2 store n into stack
+    sw 5 7 -3 store return address into stack
+    beq 1 2 return if n == r then return
+    beq 0 2 return if r == 0 then return
+    lw 0 6 neg1 load -1 into reg6
+    add 1 6 1 n = n - 1
+    add 2 6 2 r = r - 1
+    lw 0 6 comb
+    jalr 6 7 jump to combi and store pc+1 into reg7
+    lw 5 2 -1 load r from stack
+    lw 5 1 -2 load n from stack
+    lw 0 6 neg1 load -1 into reg6
+    add 1 6 1 n = n - 1
+    lw 0 6 comb
+    jalr 6 7 jump to combi and store pc+1 into reg7
+    lw 5 7 -3 load return address from stack
+    lw 0 6 RStack
+    add 5 6 5 sp = sp - 4
+    lw 5 4 0 load ans from stack
+    add 4 3 3
+    sw 5 3 0 store ans into stack
+    add 0 3 6
+    jalr 7 0 jump to return address and store pc+1 into reg7
+return lw 0 6 RStack
+    add 5 6 5 sp = sp - 4
+    lw 5 3 0 load ans from stack
+    lw 0 6 one
+    add 3 6 3
+    sw 5 3 0 store ans into stack
+    jalr 7 0 jump to return address and store pc+1 into reg7
+n .fill 7
+r .fill 2
+comb .fill combi
+sStack .fill 100
+ans .fill 0
+neg1 .fill -1
+one .fill 1
+RStack .fill -4
+rStack .fill 4 to store 4 registers
+zero .fill 0

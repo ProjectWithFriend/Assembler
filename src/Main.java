@@ -2,6 +2,7 @@ import Parser.*;
 import Tokenizer.*;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Objects;
 import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
@@ -12,6 +13,7 @@ public class Main {
             Scanner scanner = new Scanner(file);
             while (scanner.hasNextLine()) {
                 String line = scanner.nextLine();
+                if(Objects.equals(line, "")) continue;
                 sb.append(line);
                 sb.append("\n");
             }
