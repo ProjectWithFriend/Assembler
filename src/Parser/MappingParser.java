@@ -43,6 +43,7 @@ public class MappingParser implements Parser {
 
     @Override
     public String PrintCode() {
+        StringBuilder p = new StringBuilder();
         MappingInstruction();
         System.out.println("Binary Code:");
         for(String code : binaryCode){
@@ -51,9 +52,11 @@ public class MappingParser implements Parser {
         }
         System.out.println("Decimal Code:");
         for(int code: decimalCode){
+            p.append(code);
+            p.append("\n");
             System.out.println(code);
         }
-        return null;
+        return p.toString();
     }
 
     private void MappingInstruction() {
