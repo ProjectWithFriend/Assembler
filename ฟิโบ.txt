@@ -1,0 +1,22 @@
+    lw 0 4 zero     f[0] = 0
+    lw 0 6 one      f[1] = 1
+    lw 0 2 one      use to add start
+    lw 0 1 input
+    lw 0 5 start    counter
+    beq 4 1 f0      if(input == 0) go to f0
+    beq 6 1 f1      if(input == 1) go to f1
+loop add 4 6 4      f[0] += f[1]
+    add 5 2 5       counter++
+    beq 5 1 f0      if(input == counter) go to f0
+    add 6 4 6       f[1] += f[0]
+    add 5 2 5       counter++
+    beq 5 1 f1      if(input == counter) go to f0
+    beq 0 0 loop    go to loop
+f0 add 3 4 3        return f[0]
+    halt
+f1 add 3 6 3        return f[1]
+    halt
+    zero .fill 0
+    one .fill 1
+    input .fill 5
+    start .fill 1
