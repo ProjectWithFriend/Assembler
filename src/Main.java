@@ -12,7 +12,7 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
 //        read input.txt file
-        File file = new File("คูณ.txt");
+        File file = new File("คอมบิ.txt");
         StringBuilder sb = new StringBuilder();
         try {
             Scanner scanner = new Scanner(file);
@@ -32,8 +32,8 @@ public class Main {
             Parser parser = new MappingParser(tokenizer.getMappingInstruction());
 
             Path path = Paths.get("output.txt");
-            String contents = parser.PrintCode();
-
+            parser.PrintCode();
+            String contents = parser.DecimalCode();
 
             Files.writeString(path, contents, StandardCharsets.UTF_8);
 
