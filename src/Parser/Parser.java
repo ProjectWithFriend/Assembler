@@ -1,5 +1,7 @@
 package Parser;
 
 public interface Parser {
-    String PrintCode();
+    void PrintCode();
+    String DecimalCode();
+    String BinaryCode();
 }
